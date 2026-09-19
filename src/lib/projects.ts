@@ -19,7 +19,7 @@ export const projects = [
 		small: false,
 		name: 'am-lyrics',
 		category: 'Music',
-		description: 'Every word, right on time.',
+		description: 'Follow every word, right on time.',
 		detail:
 			'Word-synced lyrics in a lightweight Web Component. Drop it into a page and let the music do the rest.',
 		technology: 'TS · Web Components',
@@ -34,7 +34,7 @@ export const projects = [
 		category: 'Tools',
 		description: 'The time. But it\'s pretty accurate.',
 		detail:
-			'Minimalistic web clock built with SvelteKit. WS on a CF Worker provide accurate time. Suitable to be left on a screen for a whole day.',
+			'Minimalistic web clock built with SvelteKit. WS on a CF Worker provides accurate time. Suitable to be left on a screen for a whole day.',
 		technology: 'SvelteKit',
 		url: 'https://github.com/binimum/time.okit.works',
 		live: 'https://time.binimum.org',
@@ -46,7 +46,7 @@ export const projects = [
 		name: 'Monochrome',
 		category: 'Music',
 		description: 'Music, without the clutter.',
-		detail: 'An open-source music player.',
+		detail: 'An open-source Hi-Res FLAC music player.',
 		technology: 'HTML · JS',
 		url: 'https://github.com/monochrome-music/monochrome',
 		live: 'https://monochrome.tf',
@@ -57,9 +57,9 @@ export const projects = [
 		small: true,
 		name: 'tidal-ui',
 		category: 'Music',
-		description: 'An webapp for Hi-Fi listening.',
+		description: 'Predecessor to Monochrome. An webapp for Hi-Fi listening.',
 		detail:
-			'A music streaming frontend built with SvelteKit. Now archived, with the source still available to explore.',
+			'A music streaming webapp built with SvelteKit. Now archived.',
 		technology: 'SvelteKit · Tailwind CSS',
 		url: 'https://github.com/binimum/tidal-ui',
 		live: null,
@@ -72,7 +72,7 @@ export const projects = [
 		category: 'Tools',
 		description: 'A highly opinionated browser test.',
 		detail:
-			'An experiment in putting browsers through their paces. Written in TypeScript, with opinions included.',
+			'Kind of spiritual successor to html5test. Written in TypeScript, highly opinionated.',
 		technology: 'TypeScript',
 		url: 'https://github.com/binimum/browser-test',
 		live: null,
@@ -85,7 +85,7 @@ export const projects = [
 		category: 'Music',
 		description: 'Different codecs. Same pair of ears.',
 		detail:
-			'Load an audio file and re-encode it at different bitrates, live in the browser. A small experiment in what you can actually hear.',
+			'Load an audio file and re-encode it at different bitrates and codecs, live in the browser. A good way to waste your time.',
 		technology: 'HTML · JavaScript',
 		url: 'https://github.com/binimum/live-bitrate-test',
 		live: 'https://binimum.github.io/live-bitrate-test/',
@@ -98,7 +98,7 @@ export const projects = [
 		category: 'Tools',
 		description: 'A way into Spotify’s public endpoints.',
 		detail:
-			'An open API for accessing public Spotify endpoints. The code and usage details live on GitHub.',
+			'An open API for accessing public Spotify endpoints. Code and usage are on GitHub.',
 		technology: 'JavaScript',
 		url: 'https://github.com/binimum/open-spotify-api',
 		live: null,
