@@ -1248,6 +1248,10 @@ p {
 .rail-pinned .project-viewport {
 	scroll-snap-type: none;
 	scrollbar-width: none;
+	touch-action: pan-y;
+}
+.rail-pinned .project-viewport::-webkit-scrollbar {
+	display: none;
 }
 .projects .project-list {
 	display: flex;
@@ -1343,18 +1347,22 @@ p {
 		--station-width: min(460px, 82vw);
 		--station-gap: 28px;
 	}
+	.rail-pinned .project-panel {
+		top: 16px;
+	}
 	.projects .project-toggle {
-		min-height: 125px;
+		min-height: 100px;
+		padding: 28px 0 12px;
 	}
 	.projects .project-description {
 		font-size: 15px;
 	}
 	.projects .project-copy > p:first-child {
-		font-size: 18px;
+		font-size: 17px;
 	}
 	.projects .project-visual {
-		height: 205px;
-		min-height: 205px;
+		height: 175px;
+		min-height: 175px;
 	}
 	.projects .project-links {
 		gap: 16px;
@@ -1366,7 +1374,7 @@ p {
 		top: 38px;
 	}
 }
-@media (min-width: 900px) and (max-height: 850px) {
+@media (max-height: 850px) {
 	.projects .section-heading {
 		padding-block: 16px;
 	}
@@ -1399,6 +1407,32 @@ p {
 	}
 	.projects .browser-drawing {
 		font-size: 26px;
+	}
+}
+@media (max-height: 720px) {
+	.projects .section-heading {
+		padding-block: 12px;
+	}
+	.projects .project-toggle {
+		min-height: 84px;
+		padding: 24px 0 8px;
+	}
+	.projects .project-name {
+		font-size: 26px;
+	}
+	.projects .project-visual {
+		height: 150px;
+		min-height: 150px;
+	}
+	.projects .project-detail {
+		gap: 10px;
+	}
+	.projects .project-copy > p:first-child {
+		font-size: 15px;
+		min-height: 2.6lh;
+	}
+	.projects .all-projects {
+		min-height: 42px;
 	}
 }
 
@@ -1569,12 +1603,14 @@ p {
 	flex-wrap: wrap;
 }
 .contact-bottom {
-	flex-wrap: nowrap;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
 	gap: clamp(10px, 2vw, 28px);
 }
 .contact-bottom .design-credit {
 	padding: 0;
 	font-size: clamp(11px, 1.2vw, 13px);
+	min-width: 0;
 }
 .contact-bottom .design-credit a {
 	display: inline;
@@ -1583,6 +1619,9 @@ p {
 .contact-bottom .back-top {
 	width: auto;
 	flex-shrink: 0;
+	margin-left: 0;
+	justify-self: end;
+	white-space: nowrap;
 	font-size: clamp(13px, 1.4vw, 18px);
 	gap: 8px;
 }

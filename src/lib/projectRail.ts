@@ -6,12 +6,14 @@ export function projectRail(
 	const panel = section.querySelector<HTMLElement>('.project-panel')!;
 	const viewport = section.querySelector<HTMLElement>('.project-viewport')!;
 	const track = section.querySelector<HTMLElement>('.project-list')!;
-	const media = matchMedia(
-		'(min-width: 900px) and (min-height: 720px) and (prefers-reduced-motion: no-preference)'
-	);
+	const media = matchMedia('(prefers-reduced-motion: no-preference)');
 	let distance = 0;
 	let frame = 0;
 	let destroyed = false;
+
+	function getStickyTop() {
+		return parseFloat(getComputedStyle(panel).top) || 24;
+	}
 
 	function report() {
 		const progress = distance > 0 ? Math.max(0, Math.min(1, viewport.scrollLeft / distance)) : 0;
@@ -23,7 +25,11 @@ export function projectRail(
 			report();
 			return;
 		}
-		const progress = Math.max(0, Math.min(distance, 24 - section.getBoundingClientRect().top));
+		const stickyTop = getStickyTop();
+		const progress = Math.max(
+			0,
+			Math.min(distance, stickyTop - section.getBoundingClientRect().top)
+		);
 		viewport.scrollLeft = progress;
 		report();
 	}
@@ -33,7 +39,12 @@ export function projectRail(
 	function measure() {
 		if (destroyed) return;
 		distance = Math.max(0, track.scrollWidth - viewport.clientWidth);
-		const pinned = media.matches && panel.offsetHeight <= innerHeight - 48 && distance > 0;
+		const stickyTop = getStickyTop();
+		const bottomMargin = Math.min(24, Math.max(12, stickyTop));
+		const pinned =
+			media.matches &&
+			panel.offsetHeight <= innerHeight - (stickyTop + bottomMargin) &&
+			distance > 0;
 		section.classList.toggle('rail-pinned', pinned);
 		section.style.setProperty('--rail-height', `${panel.offsetHeight + distance}px`);
 		section.dataset.railDistance = String(distance);
@@ -56,15 +67,16 @@ export function projectRail(
 	resize.observe(viewport);
 	resize.observe(track);
 	const mutation = new MutationObserver(() => {
+		const stickyTop = getStickyTop();
 		const wasInside =
 			section.classList.contains('rail-pinned') &&
-			section.getBoundingClientRect().top <= 24 &&
-			section.getBoundingClientRect().bottom >= panel.offsetHeight + 23;
+			section.getBoundingClientRect().top <= stickyTop &&
+			section.getBoundingClientRect().bottom >= panel.offsetHeight + stickyTop - 1;
 		measure();
 		viewport.scrollLeft = 0;
 		if (wasInside)
 			window.scrollTo({
-				top: scrollY + section.getBoundingClientRect().top - 24,
+				top: scrollY + section.getBoundingClientRect().top - stickyTop,
 				behavior: 'instant'
 			});
 	});
@@ -94,14 +106,16 @@ export function projectRail(
 export function revealProject(card: HTMLElement) {
 	const section = card.closest<HTMLElement>('.projects')!;
 	const viewport = section.querySelector<HTMLElement>('.project-viewport')!;
+	const panel = section.querySelector<HTMLElement>('.project-panel')!;
 	const cards = [...viewport.querySelectorAll<HTMLElement>('.project')];
 	const index = cards.indexOf(card);
 	const distance = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
 	const offset = cards.length > 1 ? (index / (cards.length - 1)) * distance : 0;
 	if (section.classList.contains('rail-pinned')) {
+		const stickyTop = parseFloat(getComputedStyle(panel).top) || 24;
 		const distance = Number(section.dataset.railDistance || 0);
 		window.scrollTo({
-			top: scrollY + section.getBoundingClientRect().top - 24 + Math.min(offset, distance),
+			top: scrollY + section.getBoundingClientRect().top - stickyTop + Math.min(offset, distance),
 			behavior: 'instant'
 		});
 	} else {
