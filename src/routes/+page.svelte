@@ -424,7 +424,7 @@
 						>Legible Prague</a
 					>
 				</p>
-				<a class="back-to-top" href="#top">Back up <Arrow direction="up" circle /></a>
+				<a class="back-to-top-f-you-easylist" href="#top">Back up <Arrow direction="up" circle /></a>
 			</div>
 		</section>
 	</main>
