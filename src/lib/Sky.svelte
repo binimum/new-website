@@ -101,7 +101,7 @@
 	.sky-toggle {
 		position: absolute;
 		z-index: 2;
-		top: 24px;
+		top: calc(24px + env(safe-area-inset-top, 0px));
 		right: max(24px, calc((100% - 1496px) / 2));
 		width: 44px;
 		height: 44px;
@@ -132,7 +132,7 @@
 			background-position: 72% center;
 		}
 		.sky-toggle {
-			top: 17px;
+			top: calc(17px + env(safe-area-inset-top, 0px));
 			right: 17px;
 		}
 	}

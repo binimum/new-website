@@ -58,9 +58,38 @@
 		if (projects.some((project) => project.id === id)) void selectProject(id);
 	}
 
+	const SKY_THEME_COLOR = '#264985';
+	const PAGE_THEME_COLOR = '#292a28';
+
+	function syncThemeColor() {
+		const headerHeight =
+			(document.querySelector('.sky-header') as HTMLElement | null)?.clientHeight ?? 0;
+		const scrolledPastSky = window.scrollY > Math.max(0, headerHeight);
+		const next = scrolledPastSky ? PAGE_THEME_COLOR : SKY_THEME_COLOR;
+		for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+			if (meta.getAttribute('content') !== next) meta.setAttribute('content', next);
+		}
+	}
+
 	onMount(() => {
 		syncProjectFromHash();
-		return () => clearTimeout(copyReset);
+		syncThemeColor();
+		let ticking = false;
+		const onScroll = () => {
+			if (ticking) return;
+			ticking = true;
+			requestAnimationFrame(() => {
+				ticking = false;
+				syncThemeColor();
+			});
+		};
+		window.addEventListener('scroll', onScroll, { passive: true });
+		window.addEventListener('resize', onScroll);
+		return () => {
+			clearTimeout(copyReset);
+			window.removeEventListener('scroll', onScroll);
+			window.removeEventListener('resize', onScroll);
+		};
 	});
 </script>
 
@@ -70,7 +99,10 @@
 	<title>{seo.title}</title>
 	<meta name="description" content={seo.description} />
 	<meta name="author" content="binimum" />
-	<meta name="theme-color" content="#292a28" />
+	<meta name="color-scheme" content="dark" />
+	<meta name="theme-color" content="#264985" media="(prefers-color-scheme: light)" />
+	<meta name="theme-color" content="#264985" media="(prefers-color-scheme: dark)" />
+	<meta name="theme-color" content="#264985" />
 	<meta name="robots" content="index, follow, max-image-preview:large" />
 	<link rel="canonical" href={seo.url} />
 	<meta property="og:type" content="website" />
