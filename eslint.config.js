@@ -9,6 +9,7 @@ import ts from 'typescript-eslint';
 const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
 
 export default defineConfig(
+	{ ignores: ['static/vendor/**'] },
 	includeIgnoreFile(gitignorePath),
 	js.configs.recommended,
 	ts.configs.recommended,
@@ -31,6 +32,13 @@ export default defineConfig(
 				extraFileExtensions: ['.svelte'],
 				parser: ts.parser
 			}
+		}
+	},
+	{
+		files: ['static/legacy.js'],
+		rules: {
+			// Classic browsers require a catch binding even when the value is unused.
+			'@typescript-eslint/no-unused-vars': ['error', { caughtErrors: 'none' }]
 		}
 	},
 	{

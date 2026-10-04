@@ -14,6 +14,126 @@
 		<meta name="msapplication-TileColor" content="#292a28" />
 		<meta name="msapplication-navbutton-color" content="#292a28" />
 		<link rel="stylesheet" href="/baseline.css" />
+		<!-- Small runtime bridges for older evergreen browsers; native APIs win when present. -->
+		<script>
+			// Make HTML5 section elements styleable in old Internet Explorer.
+			var sections = 'header main nav section article footer'.split(' ');
+			for (var sectionIndex = 0; sectionIndex < sections.length; sectionIndex++) {
+				document.createElement(sections[sectionIndex]);
+			}
+			// SvelteKit preloading constructs this observer even when the sky does not need it.
+			// Load the local standards polyfill synchronously before the module entry point.
+			if (
+				window.Promise &&
+				window.MutationObserver &&
+				(!window.IntersectionObserver ||
+					!window.IntersectionObserverEntry ||
+					!('isIntersecting' in IntersectionObserverEntry.prototype))
+			) {
+				if (typeof window.IntersectionObserver !== 'function') {
+					delete window.IntersectionObserver;
+					delete window.IntersectionObserverEntry;
+				}
+				document.write('<script src="/vendor/intersection-observer.js"><' + '/script>');
+			}
+			if (window.Promise && !Promise.prototype['finally']) {
+				Object.defineProperty(Promise.prototype, 'finally', {
+					configurable: true,
+					writable: true,
+					value: function (callback) {
+						var constructor = this.constructor;
+						if (typeof callback !== 'function') return this.then(callback, callback);
+						return this.then(
+							function (value) {
+								return constructor.resolve(callback()).then(function () {
+									return value;
+								});
+							},
+							function (error) {
+								return constructor.resolve(callback()).then(function () {
+									throw error;
+								});
+							}
+						);
+					}
+				});
+			}
+			if (window.Event && !Event.prototype.composedPath) {
+				Event.prototype.composedPath = function () {
+					var path = [];
+					var node = this.target;
+					while (node) {
+						path.push(node);
+						node = node.assignedSlot || node.parentNode || node.host;
+					}
+					if (path[path.length - 1] === document) path.push(window);
+					return path;
+				};
+			}
+			if (!window.globalThis) window.globalThis = window;
+			if (!String.prototype.replaceAll && window.Symbol) {
+				Object.defineProperty(String.prototype, 'replaceAll', {
+					configurable: true,
+					writable: true,
+					value: function (search, replacement) {
+						'use strict';
+						if (this == null) throw new TypeError('Expected a string');
+						if (search != null) {
+							var matcher = search[Symbol.match];
+							var regex =
+								matcher === undefined
+									? Object.prototype.toString.call(search) === '[object RegExp]'
+									: !!matcher;
+							if (regex && String(search.flags).indexOf('g') === -1) {
+								throw new TypeError('Expected a global regular expression');
+							}
+							var replacer = search[Symbol.replace];
+							if (replacer != null) {
+								if (typeof replacer !== 'function') throw new TypeError('Expected a function');
+								return replacer.call(search, String(this), replacement);
+							}
+						}
+						var escaped = String(search).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+						return String(this).replace(new RegExp(escaped, 'g'), replacement);
+					}
+				});
+			}
+			if (!Object.fromEntries && Array.from && window.Symbol) {
+				Object.defineProperty(Object, 'fromEntries', {
+					configurable: true,
+					writable: true,
+					value: function (entries) {
+						if (entries == null || typeof entries[Symbol.iterator] !== 'function') {
+							throw new TypeError('Expected an iterable');
+						}
+						var result = {};
+						Array.from(entries).forEach(function (entry) {
+							if (Object(entry) !== entry) throw new TypeError('Expected an entry');
+							Object.defineProperty(result, entry[0], {
+								value: entry[1],
+								enumerable: true,
+								configurable: true,
+								writable: true
+							});
+						});
+						return result;
+					}
+				});
+			}
+			if (!window.queueMicrotask && window.Promise) {
+				window.queueMicrotask = function (callback) {
+					if (typeof callback !== 'function') throw new TypeError('Expected a function');
+					Promise.resolve()
+						.then(callback)
+						['catch'](function (error) {
+							setTimeout(function () {
+								throw error;
+							}, 0);
+						});
+				};
+			}
+		</script>
+		<script nomodule defer src="/legacy.js"></script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

@@ -8,6 +8,7 @@
 	import RouteMap from '$lib/RouteMap.svelte';
 	import { projectRail, revealProject } from '$lib/projectRail';
 	import { projects, type Category } from '$lib/projects';
+	import { canCopyText, copyText } from '$lib/clipboard';
 
 	let category = $state<Category>('All');
 	let canCopy = $state(false);
@@ -40,7 +41,7 @@
 
 	async function copyDiscord() {
 		try {
-			await navigator.clipboard.writeText('binimum');
+			await copyText('binimum');
 			clearTimeout(copyReset);
 			copied = true;
 			copyReset = setTimeout(() => {
@@ -73,7 +74,7 @@
 	}
 
 	onMount(() => {
-		canCopy = typeof navigator.clipboard?.writeText === 'function';
+		canCopy = canCopyText();
 		syncProjectFromHash();
 		syncThemeColor();
 		let ticking = false;
@@ -262,12 +263,15 @@
 										<div class="project-detail">
 											<div class={'project-visual visual-' + project.preview}>
 												{#if project.preview === 'lyrics'}
-													<img
-														class="project-poster poster-lyrics"
-														src="/am-lyrics.webp"
-														alt=""
-														loading="lazy"
-													/>
+													<picture>
+														<source srcset="/am-lyrics.webp" type="image/webp" />
+														<img
+															class="project-poster poster-lyrics"
+															src="/am-lyrics.jpg"
+															alt=""
+															loading="lazy"
+														/>
+													</picture>
 												{:else if project.preview === 'clock'}
 													<iframe
 														class="clock-embed"
@@ -277,12 +281,15 @@
 														tabindex="-1"
 													></iframe>
 												{:else if project.preview === 'binilyrics'}
-													<img
-														class="project-poster poster-api"
-														src="/lyrics-api.webp"
-														alt=""
-														loading="lazy"
-													/>
+													<picture>
+														<source srcset="/lyrics-api.webp" type="image/webp" />
+														<img
+															class="project-poster poster-api"
+															src="/lyrics-api.jpg"
+															alt=""
+															loading="lazy"
+														/>
+													</picture>
 												{/if}
 												{#if project.live}
 													<!-- eslint-disable svelte/no-navigation-without-resolve -->

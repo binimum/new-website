@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { listenToMedia } from './mediaPreference';
 
 	let video: HTMLVideoElement;
 	let playing = $state(false);
@@ -13,9 +14,13 @@
 		if (userPaused || reducedMotion || !visible || document.hidden) {
 			video.pause();
 		} else {
-			void video.play().catch(() => {
-				playing = false;
-			});
+			// Early HTMLMediaElement implementations return void instead of a promise.
+			const playback = video.play();
+			if (playback && typeof playback.catch === 'function') {
+				void playback.catch(() => {
+					playing = false;
+				});
+			}
 		}
 	}
 
@@ -29,32 +34,43 @@
 			if (
 				typeof CSS === 'undefined' ||
 				typeof CSS.supports !== 'function' ||
-				!CSS.supports(
-					'(display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0)'
-				) ||
-				typeof window.matchMedia !== 'function' ||
-				typeof IntersectionObserver === 'undefined'
+				!CSS.supports('display', 'flex') ||
+				typeof window.matchMedia !== 'function'
 			)
 				return;
 			video = element;
 			const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
-			if (typeof preference.addEventListener !== 'function') return;
 			const updatePreference = () => {
 				reducedMotion = preference.matches;
 				syncPlayback();
 			};
 			updatePreference();
-			preference.addEventListener('change', updatePreference);
+			const stopListening = listenToMedia(preference, updatePreference);
 			document.addEventListener('visibilitychange', syncPlayback);
-			const observer = new IntersectionObserver(([entry]) => {
-				visible = entry.isIntersecting;
+			const updateVisibility = () => {
+				const bounds = video.getBoundingClientRect();
+				visible = bounds.bottom > 0 && bounds.top < window.innerHeight;
 				syncPlayback();
-			});
-			observer.observe(video);
+			};
+			const observer =
+				typeof IntersectionObserver === 'function'
+					? new IntersectionObserver(([entry]) => {
+							visible = entry.isIntersecting;
+							syncPlayback();
+						})
+					: null;
+			if (observer) observer.observe(video);
+			else {
+				window.addEventListener('scroll', updateVisibility, { passive: true });
+				window.addEventListener('resize', updateVisibility);
+				updateVisibility();
+			}
 			ready = true;
 			return () => {
-				observer.disconnect();
-				preference.removeEventListener('change', updatePreference);
+				observer?.disconnect();
+				stopListening();
+				window.removeEventListener('scroll', updateVisibility);
+				window.removeEventListener('resize', updateVisibility);
 				document.removeEventListener('visibilitychange', syncPlayback);
 				video.pause();
 			};
@@ -63,7 +79,12 @@
 </script>
 
 <div class="sky" aria-hidden="true">
+	<picture class="sky-poster">
+		<source srcset="/bg/sky-poster.webp" type="image/webp" />
+		<img src="/bg/sky-poster.jpg" alt="" />
+	</picture>
 	<video
+		style:visibility={ready && !reducedMotion ? 'visible' : 'hidden'}
 		{@attach attachVideo}
 		muted
 		playsinline
@@ -93,14 +114,31 @@
 {/if}
 
 <style>
-	@supports (display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0) {
+	@supports (display: block) {
 		.sky {
 			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
 			inset: 0;
 			overflow: hidden;
 			background: #264985 url('/bg/sky-poster.webp') center / cover;
 		}
+		.sky-poster {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+		}
+		.sky-poster :global(img) {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
 		video {
+			position: relative;
 			width: 100%;
 			height: 100%;
 			display: block;
@@ -109,13 +147,19 @@
 		}
 		.sky-shade {
 			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
 			inset: 0;
 			background: linear-gradient(0deg, #10243c99, #10243c12 38%, transparent 65%);
 		}
 		.sky-toggle {
 			position: absolute;
 			z-index: 2;
+			top: 24px;
 			top: calc(24px + env(safe-area-inset-top, 0px));
+			right: 24px;
 			right: max(24px, calc((100% - 1496px) / 2));
 			width: 44px;
 			height: 44px;
@@ -128,7 +172,7 @@
 				background 180ms ease,
 				transform 180ms ease;
 		}
-		.sky-toggle svg {
+		.sky-toggle :global(svg) {
 			width: 19px;
 			height: 19px;
 		}
@@ -139,13 +183,27 @@
 			transform: scale(0.96);
 		}
 		@media (max-width: 760px) {
+			.sky-poster {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+			}
+			.sky-poster :global(img) {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
 			video {
+				position: relative;
 				object-position: 72% center;
 			}
 			.sky {
 				background-position: 72% center;
 			}
 			.sky-toggle {
+				top: 17px;
 				top: calc(17px + env(safe-area-inset-top, 0px));
 				right: 17px;
 			}

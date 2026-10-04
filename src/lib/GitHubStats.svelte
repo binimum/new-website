@@ -3,7 +3,10 @@
 	import { fetchGitHubStats, validStats, type GitHubStats } from '$lib/githubStats';
 
 	let stats = $state<GitHubStats | null>(null);
-	const number = new Intl.NumberFormat('en-GB');
+	const number =
+		typeof Intl !== 'undefined' && typeof Intl.NumberFormat === 'function'
+			? new Intl.NumberFormat('en-GB')
+			: { format: (value: number) => String(value) };
 	onMount(() => {
 		const key = 'binimum-github-stats-v1';
 		try {
@@ -19,6 +22,7 @@
 		} catch {
 			// no storage ig
 		}
+		if (typeof fetch !== 'function' || typeof AbortController !== 'function') return;
 		const controller = new AbortController();
 		const timeout = setTimeout(() => controller.abort(), 15_000);
 		void fetchGitHubStats(controller.signal)
@@ -34,7 +38,7 @@
 			.catch(() => {
 				/* don't display invented counts when GitHub is unavailable. */
 			})
-			.finally(() => clearTimeout(timeout));
+			.then(() => clearTimeout(timeout));
 		return () => {
 			clearTimeout(timeout);
 			controller.abort();
@@ -80,10 +84,11 @@
 {/if}
 
 <style>
-	@supports (display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0) {
+	@supports (display: block) {
 		.github-stats {
 			display: flex;
 			flex-wrap: wrap;
+			grid-gap: 4px 20px;
 			gap: 4px 20px;
 			font-size: 14px;
 			font-variant-numeric: tabular-nums;
@@ -91,6 +96,7 @@
 		a {
 			display: inline-flex;
 			align-items: center;
+			grid-gap: 7px;
 			gap: 7px;
 			min-height: 44px;
 		}

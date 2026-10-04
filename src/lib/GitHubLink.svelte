@@ -24,7 +24,7 @@
 </a>
 
 <style>
-	@supports (display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0) {
+	@supports (display: block) {
 		.github-mark {
 			display: inline-flex;
 			align-items: center;
@@ -44,12 +44,18 @@
 			overflow: visible;
 			transition: transform 180ms ease;
 		}
+		.github-mark:hover {
+			color: #b9c9ff;
+		}
 		.github-mark:hover,
 		.github-mark:focus-visible {
 			color: #b9c9ff;
 		}
-		.github-mark:hover svg,
-		.github-mark:focus-visible svg {
+		.github-mark:hover :global(svg) {
+			transform: translate(1px, -1px);
+		}
+		.github-mark:hover :global(svg),
+		.github-mark:focus-visible :global(svg) {
 			transform: translate(1px, -1px);
 		}
 		.github-mark:active {

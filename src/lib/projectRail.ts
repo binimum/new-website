@@ -1,22 +1,20 @@
+import { listenToMedia } from './mediaPreference';
+
 export function projectRail(
 	section: HTMLElement,
 	onProgress: (progress: number, index: number) => void
 ) {
-	// The HTML is a vertical list until every rail dependency is available.
+	// Keep the styled grid until the independent rail dependencies are available.
 	if (
 		typeof CSS === 'undefined' ||
 		typeof CSS.supports !== 'function' ||
-		!CSS.supports(
-			'(display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0)'
-		) ||
+		!CSS.supports('(display: flex) and (color: var(--white))') ||
 		!CSS.supports('position', 'sticky') ||
-		typeof ResizeObserver === 'undefined' ||
 		typeof MutationObserver === 'undefined' ||
 		typeof matchMedia !== 'function'
 	)
 		return;
-	const media = matchMedia('(prefers-reduced-motion: no-preference)');
-	if (typeof media.addEventListener !== 'function') return;
+	const media = matchMedia('(prefers-reduced-motion: reduce)');
 	const panel = section.querySelector<HTMLElement>('.project-panel')!;
 	const viewport = section.querySelector<HTMLElement>('.project-viewport')!;
 	const track = section.querySelector<HTMLElement>('.project-list')!;
@@ -66,7 +64,7 @@ export function projectRail(
 		const stickyTop = getStickyTop();
 		const bottomMargin = Math.min(24, Math.max(12, stickyTop));
 		let pinned =
-			media.matches &&
+			!media.matches &&
 			getComputedStyle(track).display === 'flex' &&
 			viewport.clientWidth > 0 &&
 			panel.offsetHeight <= innerHeight - (stickyTop + bottomMargin) &&
@@ -110,10 +108,12 @@ export function projectRail(
 		if (bounds.left < visible.left - 1 || bounds.right > visible.right + 1) revealProject(card);
 	}
 	section.classList.add('rail-ready');
-	const resize = new ResizeObserver(measure);
-	resize.observe(panel);
-	resize.observe(viewport);
-	resize.observe(track);
+	const resize = typeof ResizeObserver === 'function' ? new ResizeObserver(measure) : null;
+	resize?.observe(panel);
+	resize?.observe(viewport);
+	resize?.observe(track);
+	// Older engines can measure on resize, loaded media, font readiness and content changes.
+	section.addEventListener('load', measure, true);
 	const mutation = new MutationObserver(() => {
 		const stickyTop = getStickyTop();
 		const wasInside =
@@ -131,7 +131,7 @@ export function projectRail(
 	mutation.observe(track, { childList: true });
 	window.addEventListener('scroll', schedule, { passive: true });
 	window.addEventListener('resize', measure);
-	media.addEventListener('change', measure);
+	const stopListening = listenToMedia(media, measure);
 	viewport.addEventListener('focusin', focus);
 	viewport.addEventListener('scroll', report, { passive: true });
 	void document.fonts?.ready.then(measure);
@@ -141,11 +141,12 @@ export function projectRail(
 			destroyed = true;
 			section.classList.remove('rail-ready', 'rail-pinned');
 			cancelAnimationFrame(frame);
-			resize.disconnect();
+			resize?.disconnect();
 			mutation.disconnect();
 			window.removeEventListener('scroll', schedule);
 			window.removeEventListener('resize', measure);
-			media.removeEventListener('change', measure);
+			stopListening();
+			section.removeEventListener('load', measure, true);
 			viewport.removeEventListener('focusin', focus);
 			viewport.removeEventListener('scroll', report);
 		}

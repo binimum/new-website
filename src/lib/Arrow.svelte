@@ -29,9 +29,10 @@
 		{#each circle ? [0, direction === 'up' ? 64 : -64] : [0] as offset (offset)}
 			<path
 				class="arrow-glyph"
+				transform={`translate(0 ${offset}) rotate(${direction === 'down' ? 90 : direction === 'up' ? -90 : direction === 'diagonal' ? -45 : 0} 32 32)`}
 				style:--arrow-offset={offset + 'px'}
 				d="M13 32H48M33 17L48 32L33 47"
-				stroke={circle ? 'var(--bg, #292a28)' : 'currentColor'}
+				stroke={circle ? '#292a28' : 'currentColor'}
 				stroke-width="7"
 				stroke-linejoin="miter"
 			/>
@@ -40,7 +41,7 @@
 </svg>
 
 <style>
-	@supports (display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0) {
+	@supports (display: block) {
 		.arrow {
 			display: block;
 			width: 1em;

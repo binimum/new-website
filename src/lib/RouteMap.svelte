@@ -65,6 +65,7 @@
 	];
 </script>
 
+<img class="map-fallback" src="/route-map.jpg" alt="Project route map" loading="lazy" />
 {#each layouts as layout (layout.kind)}
 	<svg
 		class="route-map"
@@ -86,6 +87,7 @@
 			{@const coords = stop[layout.kind]}
 			<a
 				href={'#project-' + stop.id}
+				xlink:href={'#project-' + stop.id}
 				onclick={(event) => {
 					if (
 						event.button !== 0 ||
@@ -105,12 +107,12 @@
 				<text x={coords[2]} y={coords[3]}>{stop.name}</text>
 			</a>
 		{/each}
-		<a href="#about" aria-label="About me">
+		<a href="#about" xlink:href="#about" aria-label="About me">
 			<circle class="hit" cx={layout.about[0]} cy={layout.about[1]} r="28" />
 			<circle class="station" cx={layout.about[0]} cy={layout.about[1]} r="6" />
 			<text x={layout.about[2]} y={layout.about[3]}>About me</text>
 		</a>
-		<a href="#contact" aria-label="Get in touch">
+		<a href="#contact" xlink:href="#contact" aria-label="Get in touch">
 			<circle class="hit" cx={layout.contact[0]} cy={layout.contact[1]} r="28" />
 			<circle class="station" cx={layout.contact[0]} cy={layout.contact[1]} r="6" />
 			<text x={layout.contact[2]} y={layout.contact[3]}>Get in touch</text>
@@ -119,7 +121,35 @@
 {/each}
 
 <style>
-	@supports (display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0) {
+	/* Keep literal SVG paints separate: component optimizers discard paired paint fallbacks. */
+	@supports (display: block) and (not (color: var(--white))) {
+		.green {
+			stroke: #6bc653;
+		}
+		.yellow {
+			stroke: #ffda40;
+		}
+		.red {
+			stroke: #ff624c;
+		}
+		.station {
+			fill: #292a28;
+		}
+		.interchange-stop {
+			fill: #292a28;
+			stroke: #f3f2e9;
+		}
+		text {
+			fill: #f3f2e9;
+		}
+		a:hover :global(.station) {
+			fill: #f3f2e9;
+		}
+	}
+	@supports (display: block) {
+		.map-fallback {
+			display: none;
+		}
 		.route-map {
 			width: 100%;
 			overflow: visible;
@@ -132,12 +162,15 @@
 			stroke-width: 12;
 		}
 		.green {
+			stroke: #6bc653;
 			stroke: var(--green);
 		}
 		.yellow {
+			stroke: #ffda40;
 			stroke: var(--yellow);
 		}
 		.red {
+			stroke: #ff624c;
 			stroke: var(--red);
 		}
 		.end {
@@ -145,13 +178,16 @@
 			stroke-width: 8;
 		}
 		.station {
+			fill: #292a28;
 			fill: var(--bg);
 			transition:
 				fill 180ms ease,
 				r 180ms ease;
 		}
 		.interchange-stop {
+			fill: #292a28;
 			fill: var(--bg);
+			stroke: #f3f2e9;
 			stroke: var(--white);
 			stroke-width: 4;
 		}
@@ -159,6 +195,7 @@
 			fill: transparent;
 		}
 		text {
+			fill: #f3f2e9;
 			fill: var(--white);
 			font-family: inherit;
 			font-size: 20px;
@@ -174,13 +211,23 @@
 			cursor: pointer;
 			outline: none;
 		}
-		a:hover .station,
-		a:focus-visible .station {
+		a:hover :global(.station) {
+			fill: #f3f2e9;
 			fill: var(--white);
 			r: 9;
 		}
-		a:hover text,
-		a:focus-visible text {
+		a:hover :global(.station),
+		a:focus-visible :global(.station) {
+			fill: #f3f2e9;
+			fill: var(--white);
+			r: 9;
+		}
+		a:hover :global(text) {
+			text-decoration: underline;
+			text-underline-offset: 5px;
+		}
+		a:hover :global(text),
+		a:focus-visible :global(text) {
 			text-decoration: underline;
 			text-underline-offset: 5px;
 		}
@@ -191,6 +238,8 @@
 			.mobile-map {
 				display: block;
 				max-width: 500px;
+				margin-left: auto;
+				margin-right: auto;
 				margin-inline: auto;
 			}
 			text {

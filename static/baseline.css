@@ -1,7 +1,13 @@
 /* Deliberately plain CSS, served unchanged for browsers without modern CSS or JS.
    Keep content in document order; no Grid, variables, layers or feature queries. */
+@font-face {
+	font-family: 'Manrope Static';
+	font-style: normal;
+	font-weight: 400;
+	src: url('/fonts/manrope-latin-400.woff') format('woff');
+}
 html {
-	font-family: 'Helvetica Neue', Arial, sans-serif;
+	font-family: 'Manrope Static', 'Helvetica Neue', Arial, sans-serif;
 	color: #f3f2e9;
 	background: #292a28;
 }
@@ -33,7 +39,10 @@ svg, .sky, .map, .mini-route, .project-visual {
 	padding: 20px;
 }
 .sky-header {
-	background: #264985;
+	background: #6d89de;
+	background-image: url('/bg/sky-poster.jpg');
+	background-position: center;
+	background-size: cover;
 }
 .identity h1 {
 	font-size: 48px;
@@ -73,4 +82,46 @@ svg, .sky, .map, .mini-route, .project-visual {
 .skip-link {
 	display: inline-block;
 	padding: 10px 20px;
+}
+
+/* Images and route colours do not depend on layout engines, scripts or variables. */
+.project-visual {
+	display: block;
+	position: relative;
+	max-width: 480px;
+	margin: 16px 0;
+}
+.project-poster {
+	display: block;
+	width: 100%;
+}
+.clock-embed {
+	width: 100%;
+	height: 240px;
+	border: 0;
+}
+.poster-link {
+	display: block;
+	padding: 8px 0;
+}
+.projects-sign, .project-name {
+	color: #6bc653;
+}
+.about-sign {
+	color: #ffda40;
+}
+.contact-sign {
+	color: #ff624c;
+}
+.project, .small-project {
+	margin-bottom: 32px;
+}
+.map {
+	display: block;
+	padding: 16px 0;
+}
+.map-fallback {
+	display: block;
+	width: 100%;
+	max-width: 920px;
 }
