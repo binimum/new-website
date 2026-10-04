@@ -40,22 +40,24 @@
 </svg>
 
 <style>
-	.arrow {
-		display: block;
-		width: 1em;
-		height: 1em;
-		flex-shrink: 0;
-	}
-	path {
-		transform-box: view-box;
-		transform-origin: 32px 32px;
-		transform: translateY(calc(var(--arrow-travel, 0px) + var(--arrow-offset)))
-			rotate(var(--rotation));
-		transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
-	}
-	@media (prefers-reduced-motion: reduce) {
+	@supports (display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0) {
+		.arrow {
+			display: block;
+			width: 1em;
+			height: 1em;
+			flex-shrink: 0;
+		}
 		path {
-			transition: none;
+			transform-box: view-box;
+			transform-origin: 32px 32px;
+			transform: translateY(calc(var(--arrow-travel, 0px) + var(--arrow-offset)))
+				rotate(var(--rotation));
+			transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+		}
+		@media (prefers-reduced-motion: reduce) {
+			path {
+				transition: none;
+			}
 		}
 	}
 </style>

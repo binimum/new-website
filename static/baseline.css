@@ -1,0 +1,76 @@
+/* Deliberately plain CSS, served unchanged for browsers without modern CSS or JS.
+   Keep content in document order; no Grid, variables, layers or feature queries. */
+html {
+	font-family: 'Helvetica Neue', Arial, sans-serif;
+	color: #f3f2e9;
+	background: #292a28;
+}
+body {
+	margin: 0;
+	line-height: 1.5;
+}
+header, main, nav, section, article {
+	display: block;
+}
+a {
+	color: #f3f2e9;
+	text-decoration: underline;
+}
+a:focus, button:focus {
+	outline: 3px solid #ffda40;
+	outline-offset: 3px;
+}
+img {
+	max-width: 100%;
+	border: 0;
+}
+svg, .sky, .map, .mini-route, .project-visual {
+	display: none;
+}
+.site, .masthead {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 20px;
+}
+.sky-header {
+	background: #264985;
+}
+.identity h1 {
+	font-size: 48px;
+}
+.identity-arrow, .heading-arrow, .about-symbol {
+	display: none;
+}
+.signpost {
+	display: block;
+	padding: 12px 0;
+}
+.route-letter, .line-badge {
+	margin-right: 10px;
+}
+.route-letter {
+	margin-left: 10px;
+}
+.project, .small-project, .about, .contact {
+	border-top: 1px solid #50514b;
+}
+.project-name, .project-description {
+	display: block;
+}
+.project-description {
+	font-size: 16px;
+	font-weight: normal;
+}
+.project-links a {
+	display: inline-block;
+	margin-right: 20px;
+	padding: 10px 0;
+}
+.email {
+	font-size: 24px;
+	word-wrap: break-word;
+}
+.skip-link {
+	display: inline-block;
+	padding: 10px 20px;
+}

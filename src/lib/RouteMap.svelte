@@ -87,6 +87,14 @@
 			<a
 				href={'#project-' + stop.id}
 				onclick={(event) => {
+					if (
+						event.button !== 0 ||
+						event.metaKey ||
+						event.ctrlKey ||
+						event.shiftKey ||
+						event.altKey
+					)
+						return;
 					event.preventDefault();
 					onselect(stop.id);
 				}}
@@ -111,103 +119,105 @@
 {/each}
 
 <style>
-	.route-map {
-		width: 100%;
-		overflow: visible;
-	}
-	.mobile-map {
-		display: none;
-	}
-	.route {
-		fill: none;
-		stroke-width: 12;
-	}
-	.green {
-		stroke: var(--green);
-	}
-	.yellow {
-		stroke: var(--yellow);
-	}
-	.red {
-		stroke: var(--red);
-	}
-	.end {
-		fill: none;
-		stroke-width: 8;
-	}
-	.station {
-		fill: var(--bg);
-		transition:
-			fill 180ms ease,
-			r 180ms ease;
-	}
-	.interchange-stop {
-		fill: var(--bg);
-		stroke: var(--white);
-		stroke-width: 4;
-	}
-	.hit {
-		fill: transparent;
-	}
-	text {
-		fill: var(--white);
-		font-family: inherit;
-		font-size: 20px;
-		font-weight: 500;
-		letter-spacing: -0.4px;
-	}
-	.you {
-		text-anchor: middle;
-		font-size: 22px;
-		font-weight: 650;
-	}
-	a {
-		cursor: pointer;
-		outline: none;
-	}
-	a:hover .station,
-	a:focus-visible .station {
-		fill: var(--white);
-		r: 9;
-	}
-	a:hover text,
-	a:focus-visible text {
-		text-decoration: underline;
-		text-underline-offset: 5px;
-	}
-	@media (max-width: 760px) {
-		.desktop-map {
-			display: none;
+	@supports (display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0) {
+		.route-map {
+			width: 100%;
+			overflow: visible;
 		}
 		.mobile-map {
-			display: block;
-			max-width: 500px;
-			margin-inline: auto;
-		}
-		text {
-			font-size: 15px;
-			letter-spacing: -0.3px;
-		}
-		.you {
-			font-size: 20px;
+			display: none;
 		}
 		.route {
-			stroke-width: 9;
+			fill: none;
+			stroke-width: 12;
+		}
+		.green {
+			stroke: var(--green);
+		}
+		.yellow {
+			stroke: var(--yellow);
+		}
+		.red {
+			stroke: var(--red);
 		}
 		.end {
-			stroke-width: 6;
+			fill: none;
+			stroke-width: 8;
 		}
 		.station {
-			r: 5;
+			fill: var(--bg);
+			transition:
+				fill 180ms ease,
+				r 180ms ease;
 		}
 		.interchange-stop {
-			r: 10;
-			stroke-width: 3;
+			fill: var(--bg);
+			stroke: var(--white);
+			stroke-width: 4;
 		}
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.station {
-			transition: none;
+		.hit {
+			fill: transparent;
+		}
+		text {
+			fill: var(--white);
+			font-family: inherit;
+			font-size: 20px;
+			font-weight: 500;
+			letter-spacing: -0.4px;
+		}
+		.you {
+			text-anchor: middle;
+			font-size: 22px;
+			font-weight: 650;
+		}
+		a {
+			cursor: pointer;
+			outline: none;
+		}
+		a:hover .station,
+		a:focus-visible .station {
+			fill: var(--white);
+			r: 9;
+		}
+		a:hover text,
+		a:focus-visible text {
+			text-decoration: underline;
+			text-underline-offset: 5px;
+		}
+		@media (max-width: 760px) {
+			.desktop-map {
+				display: none;
+			}
+			.mobile-map {
+				display: block;
+				max-width: 500px;
+				margin-inline: auto;
+			}
+			text {
+				font-size: 15px;
+				letter-spacing: -0.3px;
+			}
+			.you {
+				font-size: 20px;
+			}
+			.route {
+				stroke-width: 9;
+			}
+			.end {
+				stroke-width: 6;
+			}
+			.station {
+				r: 5;
+			}
+			.interchange-stop {
+				r: 10;
+				stroke-width: 3;
+			}
+		}
+		@media (prefers-reduced-motion: reduce) {
+			.station {
+				transition: none;
+			}
 		}
 	}
 </style>

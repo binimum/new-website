@@ -10,6 +10,7 @@
 	import { projects, type Category } from '$lib/projects';
 
 	let category = $state<Category>('All');
+	let canCopy = $state(false);
 	let copied = $state(false);
 	let copyError = $state(false);
 	let copyReset: ReturnType<typeof setTimeout>;
@@ -72,6 +73,7 @@
 	}
 
 	onMount(() => {
+		canCopy = typeof navigator.clipboard?.writeText === 'function';
 		syncProjectFromHash();
 		syncThemeColor();
 		let ticking = false;
@@ -196,19 +198,30 @@
 					<nav class="mini-route" aria-label="Project stations">
 						<span class="mini-route-line" aria-hidden="true"></span>
 						{#each featured as project, index (project.id)}
-							<button
-								type="button"
+							<a
+								href={'#project-' + project.id}
 								class:current={activeStation === index}
 								aria-label={'Go to ' + project.name}
 								aria-current={activeStation === index ? 'step' : undefined}
 								title={project.name}
-								onclick={() => selectProject(project.id)}
+								onclick={(event) => {
+									if (
+										event.button !== 0 ||
+										event.metaKey ||
+										event.ctrlKey ||
+										event.shiftKey ||
+										event.altKey
+									)
+										return;
+									event.preventDefault();
+									void selectProject(project.id);
+								}}
 								><span
 									style:opacity={Math.min(
 										1,
 										Math.abs(index / Math.max(1, featured.length - 1) - routeProgress) * 5
 									)}
-								></span></button
+								></span></a
 							>
 						{/each}
 						<span class="route-train" aria-hidden="true"
@@ -403,43 +416,49 @@
 				><span>max@binimum.org</span><Arrow direction="diagonal" /></a
 			>
 			<div class="contact-discord">
-				<button
-					type="button"
-					class="discord"
-					onclick={copyDiscord}
-					aria-label={copied ? 'Copied Discord username binimum' : 'Copy Discord username binimum'}
-					><svg class="discord-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
-						><path
-							d="M20.3 4.4a19.8 19.8 0 0 0-4.9-1.5l-.6 1.2a18.3 18.3 0 0 0-5.5 0l-.6-1.2a20 20 0 0 0-4.9 1.5C.7 9 .1 13.5.4 17.9a20 20 0 0 0 6 3l1.2-2a12.8 12.8 0 0 1-1.9-.9l.5-.4a14.3 14.3 0 0 0 11.6 0l.5.4a12.8 12.8 0 0 1-1.9.9l1.2 2a20 20 0 0 0 6-3c.4-5.1-.8-9.6-3.3-13.5ZM8 15.2c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4Zm8 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4Z"
-						/></svg
-					><span>{copied ? 'Copied @binimum' : '@binimum'}</span><span
-						class="copy-feedback"
-						class:copied
-						aria-hidden="true"
-					>
-						<svg
-							class="copy-icon"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							><rect x="9" y="9" width="13" height="13" rx="2" /><path
-								d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+				{#if canCopy}
+					<button
+						type="button"
+						class="discord"
+						onclick={copyDiscord}
+						aria-label={copied
+							? 'Copied Discord username binimum'
+							: 'Copy Discord username binimum'}
+						><svg class="discord-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
+							><path
+								d="M20.3 4.4a19.8 19.8 0 0 0-4.9-1.5l-.6 1.2a18.3 18.3 0 0 0-5.5 0l-.6-1.2a20 20 0 0 0-4.9 1.5C.7 9 .1 13.5.4 17.9a20 20 0 0 0 6 3l1.2-2a12.8 12.8 0 0 1-1.9-.9l.5-.4a14.3 14.3 0 0 0 11.6 0l.5.4a12.8 12.8 0 0 1-1.9.9l1.2 2a20 20 0 0 0 6-3c.4-5.1-.8-9.6-3.3-13.5ZM8 15.2c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4Zm8 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4Z"
 							/></svg
+						><span>{copied ? 'Copied @binimum' : '@binimum'}</span><span
+							class="copy-feedback"
+							class:copied
+							aria-hidden="true"
 						>
-						<svg
-							class="check-icon"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"><path d="m20 6-11 11-5-5" /></svg
-						>
-					</span></button
-				>
+							<svg
+								class="copy-icon"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								><rect x="9" y="9" width="13" height="13" rx="2" /><path
+									d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+								/></svg
+							>
+							<svg
+								class="check-icon"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"><path d="m20 6-11 11-5-5" /></svg
+							>
+						</span></button
+					>
+				{:else}
+					<p class="discord-name">Discord: @binimum</p>
+				{/if}
 				<span class="sr-only" role="status"
 					>{copied
 						? 'Discord username copied to clipboard.'
@@ -456,7 +475,8 @@
 						>Legible Prague</a
 					>
 				</p>
-				<a class="back-to-top-f-you-easylist" href="#top">Back up <Arrow direction="up" circle /></a>
+				<a class="back-to-top-f-you-easylist" href="#top">Back up <Arrow direction="up" circle /></a
+				>
 			</div>
 		</section>
 	</main>

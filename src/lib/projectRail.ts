@@ -1,22 +1,39 @@
-// TODO: map ordinary page scrolling onto the horizontal track without trapping wheel events.
 export function projectRail(
 	section: HTMLElement,
 	onProgress: (progress: number, index: number) => void
 ) {
+	// The HTML is a vertical list until every rail dependency is available.
+	if (
+		typeof CSS === 'undefined' ||
+		typeof CSS.supports !== 'function' ||
+		!CSS.supports(
+			'(display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0)'
+		) ||
+		!CSS.supports('position', 'sticky') ||
+		typeof ResizeObserver === 'undefined' ||
+		typeof MutationObserver === 'undefined' ||
+		typeof matchMedia !== 'function'
+	)
+		return;
+	const media = matchMedia('(prefers-reduced-motion: no-preference)');
+	if (typeof media.addEventListener !== 'function') return;
 	const panel = section.querySelector<HTMLElement>('.project-panel')!;
 	const viewport = section.querySelector<HTMLElement>('.project-viewport')!;
 	const track = section.querySelector<HTMLElement>('.project-list')!;
-	const media = matchMedia('(prefers-reduced-motion: no-preference)');
 	let distance = 0;
 	let frame = 0;
 	let destroyed = false;
+	let fallbackSize = '';
 
 	function getStickyTop() {
 		return parseFloat(getComputedStyle(panel).top) || 24;
 	}
 
 	function report() {
-		const progress = distance > 0 ? Math.max(0, Math.min(1, viewport.scrollLeft / distance)) : 0;
+		const progress =
+			section.classList.contains('rail-ready') && distance > 0
+				? Math.max(0, Math.min(1, viewport.scrollLeft / distance))
+				: 0;
 		onProgress(progress, Math.round(progress * Math.max(0, track.children.length - 1)));
 	}
 	function update() {
@@ -38,16 +55,46 @@ export function projectRail(
 	}
 	function measure() {
 		if (destroyed) return;
+		const size = `${innerWidth}:${innerHeight}`;
+		// Do not repeatedly switch a fallback grid into a rail during observer callbacks.
+		// The temporary height change can disturb native fragment scrolling.
+		if (!section.classList.contains('rail-ready') && fallbackSize === size) return;
+		const previousScrollY = scrollY;
+		// Measure the enhanced layout before deciding whether it is usable here.
+		section.classList.add('rail-ready');
 		distance = Math.max(0, track.scrollWidth - viewport.clientWidth);
 		const stickyTop = getStickyTop();
 		const bottomMargin = Math.min(24, Math.max(12, stickyTop));
-		const pinned =
+		let pinned =
 			media.matches &&
+			getComputedStyle(track).display === 'flex' &&
+			viewport.clientWidth > 0 &&
 			panel.offsetHeight <= innerHeight - (stickyTop + bottomMargin) &&
 			distance > 0;
+		if (pinned) {
+			// A support query alone cannot detect a broken or overridden scroll layout.
+			const previousScroll = viewport.scrollLeft;
+			const previousSnap = viewport.style.scrollSnapType;
+			viewport.style.scrollSnapType = 'none';
+			viewport.scrollLeft = previousScroll > 0 ? 0 : 1;
+			pinned = Math.abs(viewport.scrollLeft - previousScroll) > 0.5;
+			viewport.scrollLeft = previousScroll;
+			viewport.style.scrollSnapType = previousSnap;
+		}
 		section.classList.toggle('rail-pinned', pinned);
-		section.style.setProperty('--rail-height', `${panel.offsetHeight + distance}px`);
-		section.dataset.railDistance = String(distance);
+		if (pinned && getComputedStyle(panel).position !== 'sticky') pinned = false;
+		section.classList.toggle('rail-ready', pinned);
+		section.classList.toggle('rail-pinned', pinned);
+		if (pinned) {
+			fallbackSize = '';
+			section.style.setProperty('--rail-height', `${panel.offsetHeight + distance}px`);
+			section.dataset.railDistance = String(distance);
+		} else {
+			fallbackSize = size;
+			section.style.removeProperty('--rail-height');
+			delete section.dataset.railDistance;
+			window.scrollTo({ top: previousScrollY, behavior: 'instant' });
+		}
 		schedule();
 	}
 	function focus(event: FocusEvent) {
@@ -62,6 +109,7 @@ export function projectRail(
 		const visible = viewport.getBoundingClientRect();
 		if (bounds.left < visible.left - 1 || bounds.right > visible.right + 1) revealProject(card);
 	}
+	section.classList.add('rail-ready');
 	const resize = new ResizeObserver(measure);
 	resize.observe(panel);
 	resize.observe(viewport);
@@ -86,11 +134,12 @@ export function projectRail(
 	media.addEventListener('change', measure);
 	viewport.addEventListener('focusin', focus);
 	viewport.addEventListener('scroll', report, { passive: true });
-	void document.fonts.ready.then(measure);
+	void document.fonts?.ready.then(measure);
 	measure();
 	return {
 		destroy() {
 			destroyed = true;
+			section.classList.remove('rail-ready', 'rail-pinned');
 			cancelAnimationFrame(frame);
 			resize.disconnect();
 			mutation.disconnect();
@@ -105,6 +154,10 @@ export function projectRail(
 
 export function revealProject(card: HTMLElement) {
 	const section = card.closest<HTMLElement>('.projects')!;
+	if (!section.classList.contains('rail-ready')) {
+		card.scrollIntoView({ block: 'start', behavior: 'instant' });
+		return;
+	}
 	const viewport = section.querySelector<HTMLElement>('.project-viewport')!;
 	const panel = section.querySelector<HTMLElement>('.project-panel')!;
 	const cards = [...viewport.querySelectorAll<HTMLElement>('.project')];

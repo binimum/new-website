@@ -80,22 +80,24 @@
 {/if}
 
 <style>
-	.github-stats {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 4px 20px;
-		font-size: 14px;
-		font-variant-numeric: tabular-nums;
-	}
-	a {
-		display: inline-flex;
-		align-items: center;
-		gap: 7px;
-		min-height: 44px;
-	}
-	svg {
-		width: 17px;
-		height: 17px;
-		flex-shrink: 0;
+	@supports (display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0) {
+		.github-stats {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 4px 20px;
+			font-size: 14px;
+			font-variant-numeric: tabular-nums;
+		}
+		a {
+			display: inline-flex;
+			align-items: center;
+			gap: 7px;
+			min-height: 44px;
+		}
+		svg {
+			width: 17px;
+			height: 17px;
+			flex-shrink: 0;
+		}
 	}
 </style>

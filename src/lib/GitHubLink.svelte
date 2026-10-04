@@ -6,6 +6,7 @@
 	aria-label="binimum on GitHub (opens in a new tab)"
 	title="GitHub ↗"
 >
+	<span class="sr-only">GitHub</span>
 	<svg
 		viewBox="0 0 64 58"
 		aria-hidden="true"
@@ -23,46 +24,48 @@
 </a>
 
 <style>
-	.github-mark {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 60px;
-		height: 58px;
-		flex-shrink: 0;
-		color: inherit;
-		transition:
-			color 180ms ease,
-			transform 180ms ease;
-	}
-	svg {
-		display: block;
-		width: 100%;
-		height: 100%;
-		overflow: visible;
-		transition: transform 180ms ease;
-	}
-	.github-mark:hover,
-	.github-mark:focus-visible {
-		color: #b9c9ff;
-	}
-	.github-mark:hover svg,
-	.github-mark:focus-visible svg {
-		transform: translate(1px, -1px);
-	}
-	.github-mark:active {
-		transform: scale(0.96);
-	}
-	@media (max-width: 760px) {
+	@supports (display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0) {
 		.github-mark {
-			width: 52px;
-			height: 44px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 60px;
+			height: 58px;
+			flex-shrink: 0;
+			color: inherit;
+			transition:
+				color 180ms ease,
+				transform 180ms ease;
 		}
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.github-mark,
 		svg {
-			transition: none;
+			display: block;
+			width: 100%;
+			height: 100%;
+			overflow: visible;
+			transition: transform 180ms ease;
+		}
+		.github-mark:hover,
+		.github-mark:focus-visible {
+			color: #b9c9ff;
+		}
+		.github-mark:hover svg,
+		.github-mark:focus-visible svg {
+			transform: translate(1px, -1px);
+		}
+		.github-mark:active {
+			transform: scale(0.96);
+		}
+		@media (max-width: 760px) {
+			.github-mark {
+				width: 52px;
+				height: 44px;
+			}
+		}
+		@media (prefers-reduced-motion: reduce) {
+			.github-mark,
+			svg {
+				transition: none;
+			}
 		}
 	}
 </style>

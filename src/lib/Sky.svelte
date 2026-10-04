@@ -3,6 +3,7 @@
 
 	let video: HTMLVideoElement;
 	let playing = $state(false);
+	let ready = $state(false);
 	let reducedMotion = $state(false);
 	let userPaused = false;
 	let visible = true;
@@ -25,8 +26,19 @@
 
 	function attachVideo(element: HTMLVideoElement) {
 		return untrack(() => {
+			if (
+				typeof CSS === 'undefined' ||
+				typeof CSS.supports !== 'function' ||
+				!CSS.supports(
+					'(display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0)'
+				) ||
+				typeof window.matchMedia !== 'function' ||
+				typeof IntersectionObserver === 'undefined'
+			)
+				return;
 			video = element;
 			const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+			if (typeof preference.addEventListener !== 'function') return;
 			const updatePreference = () => {
 				reducedMotion = preference.matches;
 				syncPlayback();
@@ -39,6 +51,7 @@
 				syncPlayback();
 			});
 			observer.observe(video);
+			ready = true;
 			return () => {
 				observer.disconnect();
 				preference.removeEventListener('change', updatePreference);
@@ -65,7 +78,7 @@
 	</video>
 	<div class="sky-shade"></div>
 </div>
-{#if !reducedMotion}
+{#if ready && !reducedMotion}
 	<button
 		class="sky-toggle"
 		type="button"
@@ -80,65 +93,67 @@
 {/if}
 
 <style>
-	.sky {
-		position: absolute;
-		inset: 0;
-		overflow: hidden;
-		background: #264985 url('/bg/sky-poster.webp') center / cover;
-	}
-	video {
-		width: 100%;
-		height: 100%;
-		display: block;
-		object-fit: cover;
-		object-position: center;
-	}
-	.sky-shade {
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(0deg, #10243c99, #10243c12 38%, transparent 65%);
-	}
-	.sky-toggle {
-		position: absolute;
-		z-index: 2;
-		top: calc(24px + env(safe-area-inset-top, 0px));
-		right: max(24px, calc((100% - 1496px) / 2));
-		width: 44px;
-		height: 44px;
-		display: grid;
-		place-items: center;
-		border-radius: 50%;
-		background: #163b5370;
-		color: white;
-		transition:
-			background 180ms ease,
-			transform 180ms ease;
-	}
-	.sky-toggle svg {
-		width: 19px;
-		height: 19px;
-	}
-	.sky-toggle:hover {
-		background: #163b53b0;
-	}
-	.sky-toggle:active {
-		transform: scale(0.96);
-	}
-	@media (max-width: 760px) {
-		video {
-			object-position: 72% center;
-		}
+	@supports (display: grid) and (width: min(1px, 2px)) and (color: var(--white)) and (inset: 0) {
 		.sky {
-			background-position: 72% center;
+			position: absolute;
+			inset: 0;
+			overflow: hidden;
+			background: #264985 url('/bg/sky-poster.webp') center / cover;
+		}
+		video {
+			width: 100%;
+			height: 100%;
+			display: block;
+			object-fit: cover;
+			object-position: center;
+		}
+		.sky-shade {
+			position: absolute;
+			inset: 0;
+			background: linear-gradient(0deg, #10243c99, #10243c12 38%, transparent 65%);
 		}
 		.sky-toggle {
-			top: calc(17px + env(safe-area-inset-top, 0px));
-			right: 17px;
+			position: absolute;
+			z-index: 2;
+			top: calc(24px + env(safe-area-inset-top, 0px));
+			right: max(24px, calc((100% - 1496px) / 2));
+			width: 44px;
+			height: 44px;
+			display: grid;
+			place-items: center;
+			border-radius: 50%;
+			background: #163b5370;
+			color: white;
+			transition:
+				background 180ms ease,
+				transform 180ms ease;
 		}
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.sky-toggle {
-			display: none;
+		.sky-toggle svg {
+			width: 19px;
+			height: 19px;
+		}
+		.sky-toggle:hover {
+			background: #163b53b0;
+		}
+		.sky-toggle:active {
+			transform: scale(0.96);
+		}
+		@media (max-width: 760px) {
+			video {
+				object-position: 72% center;
+			}
+			.sky {
+				background-position: 72% center;
+			}
+			.sky-toggle {
+				top: calc(17px + env(safe-area-inset-top, 0px));
+				right: 17px;
+			}
+		}
+		@media (prefers-reduced-motion: reduce) {
+			.sky-toggle {
+				display: none;
+			}
 		}
 	}
 </style>
