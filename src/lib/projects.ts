@@ -4,13 +4,13 @@ export type Category = 'All' | 'Music' | 'Tools';
 export const projects = [
 	{
 		id: 'binilyrics',
-		name: 'BiniLyrics',
+		name: 'lrc.red (formerly BiniLyrics)',
 		category: 'Music',
 		description: 'Lyrics used in the apps you love.',
-		detail: 'My lyrics API, contributed to by the community. Used by Better Lyrics, Metrolist, Monochrome, and <am-lyrics>.',
-		technology: 'libSQL · API',
+		detail: 'Lyrics API, contributed to by the community (and now also AI word synced). Used by Better Lyrics, Metrolist, Monochrome, and <am-lyrics>.',
+		technology: 'API',
 		url: null,
-		live: 'https://lyrics.binimum.org',
+		live: 'https://lrc.red',
 		preview: 'binilyrics',
 		small: false
 	},
