@@ -1,9 +1,13 @@
+<script lang="ts">
+	let { label }: { label: string } = $props();
+</script>
+
 <a
 	class="github-mark"
 	href="https://github.com/binimum"
 	target="_blank"
 	rel="noreferrer"
-	aria-label="binimum on GitHub (opens in a new tab)"
+	aria-label={label}
 	title="GitHub ↗"
 >
 	<span class="sr-only">GitHub</span>

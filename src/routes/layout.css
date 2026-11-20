@@ -816,6 +816,7 @@
 		margin-left: 7px;
 	}
 	.discord {
+		display: inline-flex;
 		padding: 0;
 		transition: transform 150ms ease;
 	}
@@ -823,7 +824,8 @@
 		transform: scale(0.96);
 	}
 	.contact-bottom a:hover,
-	.discord:hover {
+	.discord:hover,
+	.discord:focus-visible {
 		color: #ff624c;
 		color: var(--red);
 	}
@@ -1924,37 +1926,6 @@
 		grid-gap: 8px;
 		gap: 8px;
 	}
-	.copy-feedback {
-		position: relative;
-		width: 22px;
-		height: 22px;
-		flex-shrink: 0;
-	}
-	.copy-feedback svg {
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		transition:
-			opacity 180ms ease,
-			transform 220ms cubic-bezier(0.2, 0, 0, 1),
-			filter 180ms ease;
-	}
-	.copy-feedback .check-icon,
-	.copy-feedback.copied .copy-icon {
-		opacity: 0;
-		transform: scale(0.25);
-		filter: blur(4px);
-	}
-	.copy-feedback.copied .check-icon {
-		opacity: 1;
-		transform: scale(1);
-		filter: blur(0);
-	}
 
 	.projects .section-heading {
 		justify-content: flex-start;
@@ -2225,10 +2196,6 @@
 	.rail-ready .route-train {
 		display: block;
 	}
-	.discord-name {
-		font-size: 20px;
-		font-size: clamp(20px, 2.4vw, 30px);
-	}
 }
 
 /* Keep this separate: minifiers may discard block before an unsupported grid value. */
@@ -2420,5 +2387,62 @@
 @supports font-tech(variations) {
 	:root {
 		font-family: 'Manrope', Arial, sans-serif;
+	}
+}
+
+@supports (display: block) {
+	[dir='rtl'] .header-aside {
+		text-align: end;
+	}
+	[dir='rtl']
+		:is(
+			.header-aside p,
+			.identity-copy p,
+			.signpost,
+			.section-heading h2,
+			.project-description,
+			.small-project p,
+			.about-copy p,
+			.about-copy p + p
+		) {
+		letter-spacing: normal;
+	}
+	[dir='rtl'] .route-letter,
+	[dir='rtl'] .mini-route {
+		margin-left: 0;
+		margin-inline-start: auto;
+	}
+	[dir='rtl'] .heading-arrow {
+		margin-left: 0;
+		margin-inline-start: -10px;
+	}
+	[dir='rtl'] .about-copy {
+		padding-right: 0;
+		padding-inline-end: 30px;
+	}
+	[dir='rtl'] .project-toggle {
+		text-align: start;
+	}
+	[dir='rtl'] .projects .heading-arrow,
+	[dir='rtl'] .identity-arrow .arrow {
+		transform: scaleX(-1);
+	}
+
+	@media (min-width: 761px) {
+		[dir='rtl'] .signposts {
+			padding-right: 0;
+			padding-inline-end: clamp(22px, 2.5vw, 38px);
+		}
+		[dir='rtl'] .map {
+			border-left: 0;
+			border-inline-start: 1px solid #50514b;
+			padding-left: 0;
+			padding-inline-start: clamp(12px, 1.3vw, 20px);
+		}
+	}
+	@media (max-width: 760px) {
+		[dir='rtl'] .about-copy {
+			padding-inline-end: 0;
+		}
 	}
 }

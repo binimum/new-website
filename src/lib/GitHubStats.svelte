@@ -2,11 +2,20 @@
 	import { onMount } from 'svelte';
 	import { fetchGitHubStats, validStats, type GitHubStats } from '$lib/githubStats';
 
+	import type { Locale, Messages } from './i18n';
+
+	let {
+		copy,
+		locale
+	}: { copy: Pick<Messages, 'starsTitle' | 'stars' | 'starsScope' | 'followers'>; locale: Locale } =
+		$props();
+
 	let stats = $state<GitHubStats | null>(null);
-	const number =
+	let number = $derived(
 		typeof Intl !== 'undefined' && typeof Intl.NumberFormat === 'function'
-			? new Intl.NumberFormat('en-GB')
-			: { format: (value: number) => String(value) };
+			? new Intl.NumberFormat(locale === 'ar' ? 'ar' : 'en-GB')
+			: { format: (value: number) => String(value) }
+	);
 	onMount(() => {
 		const key = 'binimum-github-stats-v1';
 		try {
@@ -52,7 +61,7 @@
 			href="https://github.com/binimum?tab=repositories"
 			target="_blank"
 			rel="noreferrer"
-			title="Stars across binimum’s public repositories and Monochrome"
+			title={copy.starsTitle}
 		>
 			<svg
 				viewBox="0 0 24 24"
@@ -62,10 +71,8 @@
 				aria-hidden="true"
 				><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z" /></svg
 			>
-			<span
-				>{number.format(stats.stars)} stars
-				<span class="sr-only">across binimum’s repositories and Monochrome</span></span
-			>
+			<span>{copy.stars(number.format(stats.stars))}</span>
+			<span class="sr-only">{copy.starsScope}</span>
 		</a>
 		<a href="https://github.com/binimum?tab=followers" target="_blank" rel="noreferrer">
 			<svg
@@ -78,7 +85,7 @@
 					d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 4v3"
 				/></svg
 			>
-			<span>{number.format(stats.followers)} followers</span>
+			<span>{copy.followers(number.format(stats.followers))}</span>
 		</a>
 	</div>
 {/if}

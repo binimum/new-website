@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { listenToMedia } from './mediaPreference';
+	import type { Messages } from './i18n';
+
+	let { copy }: { copy: Pick<Messages, 'play' | 'pause'> } = $props();
 
 	let video: HTMLVideoElement;
 	let playing = $state(false);
@@ -78,7 +81,7 @@
 	}
 </script>
 
-<div class="sky" aria-hidden="true">
+<div class="sky" aria-hidden="true" data-play-label={copy.play} data-pause-label={copy.pause}>
 	<picture class="sky-poster">
 		<source srcset="/bg/sky-poster.webp" type="image/webp" />
 		<img src="/bg/sky-poster.jpg" alt="" />
@@ -104,7 +107,7 @@
 		class="sky-toggle"
 		type="button"
 		onclick={togglePlayback}
-		aria-label={playing ? 'Pause sky video' : 'Play sky video'}
+		aria-label={playing ? copy.pause : copy.play}
 		aria-pressed={!playing}
 	>
 		<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
@@ -206,6 +209,16 @@
 				top: 17px;
 				top: calc(17px + env(safe-area-inset-top, 0px));
 				right: 17px;
+			}
+		}
+		:global([dir='rtl']) .sky-toggle {
+			left: 24px;
+			left: max(24px, calc((100% - 1496px) / 2));
+			right: auto;
+		}
+		@media (max-width: 760px) {
+			:global([dir='rtl']) .sky-toggle {
+				left: 17px;
 			}
 		}
 		@media (prefers-reduced-motion: reduce) {

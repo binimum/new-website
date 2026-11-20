@@ -1,5 +1,15 @@
 <script lang="ts">
-	let { onselect }: { onselect: (id: string) => void } = $props();
+	import type { Locale, Messages } from './i18n';
+
+	let {
+		copy,
+		locale,
+		onselect
+	}: {
+		copy: Pick<Messages, 'mapAlt' | 'mapLabel' | 'explore' | 'about' | 'contact'>;
+		locale: Locale;
+		onselect: (id: string) => void;
+	} = $props();
 	const stops = [
 		{ id: 'am-lyrics', name: 'am-lyrics', desktop: [130, 141, 95, 112], mobile: [50, 105, 18, 79] },
 		{
@@ -65,7 +75,9 @@
 	];
 </script>
 
-<img class="map-fallback" src="/route-map.jpg" alt="Project route map" loading="lazy" />
+{#if locale === 'en'}
+	<img class="map-fallback" src="/route-map.jpg" alt={copy.mapAlt} loading="lazy" />
+{/if}
 {#each layouts as layout (layout.kind)}
 	<svg
 		class="route-map"
@@ -73,7 +85,8 @@
 		class:desktop-map={layout.kind === 'desktop'}
 		viewBox={layout.viewBox}
 		role="group"
-		aria-label="Project map. Select a station to explore a project."
+		aria-label={copy.mapLabel}
+		style:direction="ltr"
 	>
 		<path class="route green" d={layout.green} />
 		<path class="route yellow" d={layout.yellow} />
@@ -100,22 +113,30 @@
 					event.preventDefault();
 					onselect(stop.id);
 				}}
-				aria-label={'Explore ' + stop.name}
+				aria-label={copy.explore(stop.name)}
 			>
 				<circle class="hit" cx={coords[0]} cy={coords[1]} r="28" />
 				<circle class="station" cx={coords[0]} cy={coords[1]} r="6" />
 				<text x={coords[2]} y={coords[3]}>{stop.name}</text>
 			</a>
 		{/each}
-		<a href="#about" xlink:href="#about" aria-label="About me">
+		<a href="#about" xlink:href="#about" aria-label={copy.about}>
 			<circle class="hit" cx={layout.about[0]} cy={layout.about[1]} r="28" />
 			<circle class="station" cx={layout.about[0]} cy={layout.about[1]} r="6" />
-			<text x={layout.about[2]} y={layout.about[3]}>About me</text>
+			<text
+				x={locale === 'ar' ? (layout.kind === 'desktop' ? 355 : 198) : layout.about[2]}
+				y={layout.about[3]}
+				direction={locale === 'ar' ? 'rtl' : 'ltr'}>{copy.about}</text
+			>
 		</a>
-		<a href="#contact" xlink:href="#contact" aria-label="Get in touch">
+		<a href="#contact" xlink:href="#contact" aria-label={copy.contact}>
 			<circle class="hit" cx={layout.contact[0]} cy={layout.contact[1]} r="28" />
 			<circle class="station" cx={layout.contact[0]} cy={layout.contact[1]} r="6" />
-			<text x={layout.contact[2]} y={layout.contact[3]}>Get in touch</text>
+			<text
+				x={locale === 'ar' ? (layout.kind === 'desktop' ? 573 : 351) : layout.contact[2]}
+				y={layout.contact[3]}
+				direction={locale === 'ar' ? 'rtl' : 'ltr'}>{copy.contact}</text
+			>
 		</a>
 	</svg>
 {/each}

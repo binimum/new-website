@@ -7,7 +7,8 @@ export const projects = [
 		name: 'lrc.red (formerly BiniLyrics)',
 		category: 'Music',
 		description: 'Lyrics used in the apps you love.',
-		detail: 'Lyrics API, contributed to by the community (and now also AI word synced). Used by Better Lyrics, Metrolist, Monochrome, and <am-lyrics>.',
+		detail:
+			'Lyrics API, contributed to by the community (and now also AI word synced). Used by Better Lyrics, Metrolist, Monochrome, and <am-lyrics>.',
 		technology: 'API',
 		url: null,
 		live: 'https://lrc.red',
@@ -32,13 +33,26 @@ export const projects = [
 		small: false,
 		name: 'time.binimum.org',
 		category: 'Tools',
-		description: 'The time. But it\'s pretty accurate.',
+		description: "The time. But it's pretty accurate.",
 		detail:
 			'Minimalistic web clock built with SvelteKit. WS on a CF Worker provides accurate time. Suitable to be left on a screen for a whole day.',
 		technology: 'SvelteKit',
 		url: 'https://github.com/binimum/time.okit.works',
 		live: 'https://time.binimum.org',
 		preview: 'clock'
+	},
+	{
+		id: 'binilink',
+		small: true,
+		name: 'BiniLink',
+		category: 'Music',
+		description: 'One track, multiple streaming services.',
+		detail:
+			'An API that returns track metadata and finds matching links across music streaming services.',
+		technology: 'API',
+		url: null,
+		live: 'https://link.binimum.org',
+		preview: 'api'
 	},
 	{
 		id: 'monochrome',
@@ -58,8 +72,7 @@ export const projects = [
 		name: 'tidal-ui',
 		category: 'Music',
 		description: 'Predecessor to Monochrome. An webapp for Hi-Fi listening.',
-		detail:
-			'A music streaming webapp built with SvelteKit. Now archived.',
+		detail: 'A music streaming webapp built with SvelteKit. Now archived.',
 		technology: 'SvelteKit · Tailwind CSS',
 		url: 'https://github.com/binimum/tidal-ui',
 		live: null,
@@ -71,8 +84,7 @@ export const projects = [
 		name: 'browser-test',
 		category: 'Tools',
 		description: 'A highly opinionated browser test.',
-		detail:
-			'Kind of spiritual successor to html5test. Written in TypeScript, highly opinionated.',
+		detail: 'Kind of spiritual successor to html5test. Written in TypeScript, highly opinionated.',
 		technology: 'TypeScript',
 		url: 'https://github.com/binimum/browser-test',
 		live: null,
@@ -97,8 +109,7 @@ export const projects = [
 		name: 'open-spotify-api',
 		category: 'Tools',
 		description: 'A way into Spotify’s public endpoints.',
-		detail:
-			'An open API for accessing public Spotify endpoints. Code and usage are on GitHub.',
+		detail: 'An open API for accessing public Spotify endpoints. Code and usage are on GitHub.',
 		technology: 'JavaScript',
 		url: 'https://github.com/binimum/open-spotify-api',
 		live: null,
